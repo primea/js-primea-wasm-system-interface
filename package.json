@@ -16,9 +16,9 @@
     "documentation": "^4.0.0-rc.1",
     "ipfs": "^0.23.1",
     "istanbul": "^1.1.0-alpha.1",
-    "primea-hypervisor": "0.0.5",
+    "primea-hypervisor": "0.1.0",
     "primea-message": "0.0.2",
-    "primea-wasm-container": "0.0.0",
+    "primea-wasm-container": "0.0.2",
     "standard": "10.0.2",
     "tape": "^4.6.3",
     "wast2wasm": "0.0.1"
