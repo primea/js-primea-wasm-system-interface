@@ -1,0 +1,26 @@
+{
+  "name": "primea-wasm-system-interface",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "coverage": "node ./node_modules/istanbul/lib/cli.js cover ./tests/index.js",
+    "coveralls": "npm run coverage && coveralls <coverage/lcov.info",
+    "lint": "standard",
+    "test": "node ./tests/index.js"
+  },
+  "author": "mjbecze <mjbecze@gmail.com>",
+  "license": "MPL-2.0",
+  "devDependencies": {
+    "coveralls": "^2.13.1",
+    "documentation": "^4.0.0-rc.1",
+    "ipfs": "^0.23.1",
+    "istanbul": "^1.1.0-alpha.1",
+    "primea-hypervisor": "0.0.5",
+    "primea-message": "0.0.2",
+    "primea-wasm-container": "0.0.0",
+    "standard": "10.0.2",
+    "tape": "^4.6.3",
+    "wast2wasm": "0.0.1"
+  }
+}
