@@ -8,7 +8,7 @@
 `npm install primea-wasm-system-inteface`
 
 # SYNOPSIS 
-This implement the system interface for wasm binaries in primea Edit
+This implement the system interface for wasm binaries in primea
 
 
 # LICENSE
