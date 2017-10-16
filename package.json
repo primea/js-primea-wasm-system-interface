@@ -4,23 +4,27 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "coverage": "node ./node_modules/istanbul/lib/cli.js cover ./tests/index.js",
-    "coveralls": "npm run coverage && coveralls <coverage/lcov.info",
+    "coveralls": "npm run coverage && nyc report --reporter=text-lcov | coveralls",
+    "coverage": "nyc npm test",
     "lint": "standard",
     "test": "node ./tests/index.js"
   },
   "author": "mjbecze <mjbecze@gmail.com>",
   "license": "MPL-2.0",
   "devDependencies": {
-    "coveralls": "^2.13.1",
-    "documentation": "^4.0.0-rc.1",
-    "ipfs": "^0.23.1",
-    "istanbul": "^1.1.0-alpha.1",
-    "primea-hypervisor": "0.1.0",
+    "coveralls": "^3.0.0",
+    "documentation": "^5.3.3",
+    "level": "^1.7.0",
+    "nyc": "^11.2.1",
+    "primea-hypervisor": "0.2.0",
     "primea-message": "0.0.2",
-    "primea-wasm-container": "0.0.2",
-    "standard": "10.0.2",
+    "primea-wasm-container": "0.0.3",
+    "standard": "^10.0.3",
     "tape": "^4.6.3",
-    "wast2wasm": "0.0.1"
+    "wast2wasm": "0.0.1",
+    "dfinity-radix-tree": "0.0.2"
+  },
+  "dependencies": {
+    "safe-buffer": "^5.1.1"
   }
 }

@@ -1,5 +1,4 @@
 const tape = require('tape')
-const IPFS = require('ipfs')
 const fs = require('fs')
 const Hypervisor = require('primea-hypervisor')
 const Message = require('primea-message')
@@ -7,227 +6,273 @@ const WasmContainer = require('primea-wasm-container')
 const SystemInterface = require('../index.js')
 const testInterface = require('./testInterface.js')
 
-const node = new IPFS({
-  start: false
+const level = require('level')
+const RadixTree = require('dfinity-radix-tree')
+const db = level('./testdb')
+
+const tree = new RadixTree({
+  db: db
 })
 
-node.on('ready', () => {
-  tape('create message', async t => {
-    t.plan(1)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/createMessage.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
-    await hypervisor.createInstance(WasmContainer.typeId, new Message({data: wasm}))
-    t.end()
+tape('create message', async t => {
+  t.plan(1)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/createMessage.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('create channel', async t => {
-    t.plan(2)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/createChannel.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
-    await hypervisor.createInstance(WasmContainer.typeId, new Message({data: wasm}))
+  const port = hypervisor.creationService.getPort()
+  await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    }
+  }))
+})
+
+tape('create channel', async t => {
+  t.plan(2)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/createChannel.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('adding a port to a message', async t => {
-    t.plan(2)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/addPort.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
-    const message = new Message({data: wasm})
-    await hypervisor.createInstance(WasmContainer.typeId, message)
+  const port = hypervisor.creationService.getPort()
+  await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    }
+  }))
+})
+
+tape('adding a port to a message', async t => {
+  t.plan(2)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/addPort.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('message data length', async t => {
-    t.plan(2)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/messageLen.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
-    const message = new Message({data: wasm})
-    await hypervisor.createInstance(WasmContainer.typeId, message)
+  const port = hypervisor.creationService.getPort()
+  await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    }
+  }))
+})
+
+tape('message data length', async t => {
+  t.plan(2)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/messageLen.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('getting a messages port', async t => {
-    t.plan(2)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/getMessagesPort.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
+  const port = hypervisor.creationService.getPort()
+  await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    }
+  }))
+})
 
-    const ports = hypervisor.createChannel()
-    const message = new Message({
-      data: wasm,
-      ports: ports
-    })
-    await hypervisor.createInstance(WasmContainer.typeId, message)
+tape('getting a messages port', async t => {
+  t.plan(2)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/getMessagesPort.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('port binding', async t => {
-    t.plan(1)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/bindPort.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
+  const ports = hypervisor.createChannel()
 
-    const ports = hypervisor.createChannel()
-    const message = new Message({data: wasm, ports: [ports[1]]})
-    const instance = await hypervisor.createInstance(WasmContainer.typeId, message)
-    t.equals(Object.keys(instance.ports.ports).length, 1)
+  const port = hypervisor.creationService.getPort()
+  await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    },
+    ports: ports
+  }))
+})
+
+tape('port binding', async t => {
+  t.plan(1)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/bindPort.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('get port', async t => {
-    t.plan(2)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/getPort.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
+  const ports = hypervisor.createChannel()
 
-    const ports = hypervisor.createChannel()
-    const message = new Message({
-      data: wasm,
-      ports: [ports[1]]
-    })
-    const instance = await hypervisor.createInstance(WasmContainer.typeId, message)
-    t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
+  const port = hypervisor.creationService.getPort()
+  const instance = await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    },
+    ports: [ports[1]]
+  }))
+  t.equals(Object.keys(instance.ports.ports).length, 1)
+})
 
-    const message2 = new Message()
-    await instance.message(message2)
+tape('get port', async t => {
+  t.plan(2)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/getPort.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('delete port', async t => {
-    t.plan(3)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/deletePort.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
+  const ports = hypervisor.createChannel()
+  const port = hypervisor.creationService.getPort()
+  const instance = await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    },
+    ports: [ports[1]]
+  }))
+  t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
 
-    const ports = hypervisor.createChannel()
-    const message = new Message({
-      data: wasm,
-      ports: [ports[1]]
-    })
-    const instance = await hypervisor.createInstance(WasmContainer.typeId, message)
-    t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
+  const message2 = new Message()
+  await instance.message(message2)
+})
 
-    const message2 = new Message()
-    await instance.message(message2)
-    t.equals(Object.keys(instance.ports.ports).length, 0, 'should delete port')
-    t.equals(ports[0].messages.length, 1, 'should have delete message')
+tape('delete port', async t => {
+  t.plan(3)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/deletePort.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('port unbinding', async t => {
-    t.plan(3)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/unbindPort.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
+  const port = hypervisor.creationService.getPort()
+  const ports = hypervisor.createChannel()
+  const instance = await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    },
+    ports: [ports[1]]
+  }))
+  t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
 
-    const ports = hypervisor.createChannel()
-    const message = new Message({data: wasm, ports: [ports[1]]})
-    const instance = await hypervisor.createInstance(WasmContainer.typeId, message)
-    t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
+  const message2 = new Message()
+  await instance.message(message2)
+  t.equals(Object.keys(instance.ports.ports).length, 0, 'should delete port')
+  t.equals(ports[0].messages.length, 1, 'should have delete message')
+})
 
-    const message2 = new Message()
-    await instance.message(message2)
-    t.equals(Object.keys(instance.ports.ports).length, 0, 'should unbind port')
+tape('port unbinding', async t => {
+  t.plan(3)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/unbindPort.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('reading message data', async t => {
-    // t.plan(3)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/readMessageData.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
+  const port = hypervisor.creationService.getPort()
+  const ports = hypervisor.createChannel()
+  const instance = await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    },
+    ports: [ports[1]]
+  }))
+  t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
 
-    const ports = hypervisor.createChannel()
-    const message = new Message({
-      data: wasm,
-      ports: [ports[1]]
-    })
+  const message2 = new Message()
+  await instance.message(message2)
+  t.equals(Object.keys(instance.ports.ports).length, 0, 'should unbind port')
+})
 
-    const instance = await hypervisor.createInstance(WasmContainer.typeId, message)
-    t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
-
-    const message2 = new Message({
-      data: new Uint8Array([1, 2, 3, 4, 5])
-    })
-    await instance.message(message2)
-    t.end()
+tape('reading message data', async t => {
+  // t.plan(3)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/readMessageData.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('create instance', async t => {
-    t.plan(1)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/createInstance.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
-    await hypervisor.createInstance(WasmContainer.typeId, new Message({data: wasm}))
+  const port = hypervisor.creationService.getPort()
+  const ports = hypervisor.createChannel()
+  const instance = await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    },
+    ports: [ports[1]]
+  }))
+  t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
+
+  const message2 = new Message({
+    data: new Uint8Array([1, 2, 3, 4, 5])
+  })
+  await instance.message(message2)
+  t.end()
+})
+
+tape('send messages', async t => {
+  t.plan(2)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/sendingMessages.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('send messages', async t => {
-    t.plan(2)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/sendingMessages.wasm`)
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
+  const port = hypervisor.creationService.getPort()
+  const ports = hypervisor.createChannel()
+  const instance = await hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    },
+    ports: [ports[1]]
+  }))
+  t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
 
-    const ports = hypervisor.createChannel()
-    const message = new Message({
-      data: wasm,
-      ports: [ports[1]]
-    })
-    const instance = await hypervisor.createInstance(WasmContainer.typeId, message)
-    t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
+  const message2 = new Message()
+  await instance.message(message2)
+  t.equals(ports[0].messages.length, 1, 'should have message')
+})
 
-    const message2 = new Message()
-    await instance.message(message2)
-    t.equals(ports[0].messages.length, 1, 'should have message')
+tape('referance map', async t => {
+  t.plan(4)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/referances.wasm`)
+
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
   })
 
-  tape('referance map', async t => {
-    t.plan(4)
-    const hypervisor = new Hypervisor(node.dag)
-    const wasm = fs.readFileSync(`${__dirname}/wasm/referances.wasm`)
-
-    hypervisor.registerContainer(WasmContainer, {
-      env: SystemInterface,
-      test: testInterface(t)
-    })
-
-    const ports = hypervisor.createChannel()
-    const message = new Message({
-      data: wasm,
-      ports: [ports[1]]
-    })
-
-    await hypervisor.createInstance(WasmContainer.typeId, message)
-  })
+  const port = hypervisor.creationService.getPort()
+  const ports = hypervisor.createChannel()
+  hypervisor.send(port, new Message({
+    data: {
+      type: WasmContainer.typeId,
+      code: wasm
+    },
+    ports: [ports[1]]
+  }))
 })

@@ -6,12 +6,6 @@ module.exports = class SystemInterface {
     this.referanceMap = wasmContainer.referanceMap
   }
 
-  createInstance (type, messageRef) {
-    const message = this.wasmContainer.referanceMap.get(messageRef)
-    const promise = this.kernel.createInstance(type, message)
-    this.wasmContainer.pushOpsQueue(promise)
-  }
-
   createMessage (offset, len) {
     const data = this.wasmContainer.getMemory(offset, len)
     const message = this.kernel.createMessage({data: data})
