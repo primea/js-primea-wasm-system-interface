@@ -1,4 +1,14 @@
-### createMessage
+# Webassembly System Interface
+
+The system interface defines which imports are avaible to webassembly programs
+running inside Primea.
+
+We define the following types:
+- `i32`: same as `i32` in WebAssembly
+- `i32ptr`: same as `i32` in WebAssembly, but treated as a pointer to a WebAssembly memory offset
+- `i32ref`: same as `i32` in WebAssembly, but treated as a referance to a Primea object
+
+### create_message
 Messages can contain data which is read from memory starting at the `offset`
 and going for `len` bytes.
 
@@ -11,8 +21,8 @@ and going for `len` bytes.
 
 * **i32ref** the refence to a the message 
 
-### createChannel
-Creates a channel and writes to port referances to memory. Each port referance
+### create_channel
+Creates a channel and writes two port referances to memory. Each port referance
 is an `i32`
 
 **Parameters**
@@ -20,9 +30,9 @@ is an `i32`
 * `locA` **i32ptr**
 * `locB` **i32ptr** 
 
-### bindPort
+### bind_port
 Assigns a byte array to a port and starts to listen for incoming messages on it.
-The byte array is used a name to retrieve the port in the future.
+The byte array is used as a name to retrieve the port in the future.
 
 **Parameters**
 
@@ -30,7 +40,7 @@ The byte array is used a name to retrieve the port in the future.
 * `len` **i32** - the number of bytes to read starting from `offset`
 * `portRef` **i32ref** - the referance to the port being bounded
 
-### unbindPort
+### unbind_port
 Stops listening to a port and returns a referance to the port
 
 **Parameters**
@@ -42,7 +52,7 @@ Stops listening to a port and returns a referance to the port
 
 * **i32ref** - the referance to the port being unbounded
 
-### getPort
+### get_port
 Given the port's name this returns a refernce to the port. 
 
 **Parameters**
@@ -54,7 +64,7 @@ Given the port's name this returns a refernce to the port.
 
 * **i32ref** - the referance to the port being unbounded
 
-### getMessageDataLen
+### get_message_data_len
 Gets the number of bytes contain in the message's data payload
 
 **Parameters**
@@ -63,7 +73,7 @@ Gets the number of bytes contain in the message's data payload
 **Returns**
 * **i32**
 
-### loadMessageData
+### load_message_data
 Loads the message's data into memory
 
 **Parameters**
@@ -72,7 +82,7 @@ Loads the message's data into memory
 * `readOffset` **i32ptr**
 * `len` **i32**
 
-### addPortToMessage
+### add_port_to_message
 Add a port ref to a message
 
 **Parameters**
@@ -80,7 +90,7 @@ Add a port ref to a message
 * `port` **i32ref** - the referance to the port
 
 
-### getMessagePortLen
+### get_message_port_len
 get the number of ports contained in the message
 
 **Parameters**
@@ -89,24 +99,24 @@ get the number of ports contained in the message
 **Returns**
 * **i32**
 
-### loadMessagePortRef(index: i32) -> i32
+### load_message_port_ref
 loads a port ref from the message
 
 **Parameters**
 * `message` **i32ref** - the referance to the message
-* `index` **i32**
+* `index` **i32** which port to in the message to load. The same port cannot be loaded twice
 
 **Returns**
 * **i32**
 
-### sendMessage
+### send_message
 sends a message on a given port
 
 **Parameters**
 * `message` **i32ref** - the referance to the message
 * `port` **i32ref** - the referance to the port
 
-### isvalidRef
+### is_valid_ref
 test is an i32 is a valid ref or not
 
 **Parameters**
@@ -115,7 +125,7 @@ test is an i32 is a valid ref or not
 **Returns**
 * **i32**
 
-### deleteRef
+### delete_ref
 deletes port or message refs 
 
 **Parameters**

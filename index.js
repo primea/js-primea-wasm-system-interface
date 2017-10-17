@@ -78,6 +78,7 @@ module.exports = class SystemInterface {
   loadMessagePort (messageRef, index) {
     const message = this.referanceMap.get(messageRef)
     const port = message.ports[index]
+    delete message.ports[index]
     return this.referanceMap.add(port)
   }
 
