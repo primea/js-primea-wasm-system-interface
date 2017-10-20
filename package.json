@@ -22,7 +22,7 @@
     "standard": "^10.0.3",
     "tape": "^4.6.3",
     "wast2wasm": "0.0.1",
-    "dfinity-radix-tree": "0.0.3"
+    "dfinity-radix-tree": "0.0.4"
   },
   "dependencies": {
     "safe-buffer": "^5.1.1"
