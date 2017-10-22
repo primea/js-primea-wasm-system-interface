@@ -4,12 +4,15 @@
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)  
 
-# install
+# INSTALL
 
 `npm install primea-wasm-system-inteface`
 
 # SYNOPSIS 
 This implement the system interface for wasm binaries in primea
+
+# WASM API
+[./docs/](./docs/spec.md)
 
 
 # LICENSE
