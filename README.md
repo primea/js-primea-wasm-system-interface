@@ -4,12 +4,26 @@
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)  
 
-# install
-
-`npm install primea-wasm-system-inteface`
-
 # SYNOPSIS 
 This implement the system interface for wasm binaries in primea
+
+# INSTALL
+`npm install primea-wasm-system-inteface`
+
+# USAGE
+```javascript
+const WasmContainer = require('primea-wasm-container')
+const SystemInterface = require('primea-system-inteface')
+
+// regester the container with the a hypervisor instance
+hypervisor.registerContainer(WasmContainer, {
+  system: SystemInterface 
+})
+
+```
+
+# WASM API
+[./docs/](./docs/spec.md)
 
 
 # LICENSE
