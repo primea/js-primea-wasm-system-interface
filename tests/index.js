@@ -25,10 +25,7 @@ tape('create message', async t => {
 
   const port = hypervisor.creationService.getPort()
   await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    }
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm])
   }))
 })
 
@@ -43,10 +40,7 @@ tape('create channel', async t => {
 
   const port = hypervisor.creationService.getPort()
   await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    }
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm])
   }))
 })
 
@@ -61,10 +55,7 @@ tape('adding a port to a message', async t => {
 
   const port = hypervisor.creationService.getPort()
   await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    }
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm])
   }))
 })
 
@@ -79,10 +70,7 @@ tape('message data length', async t => {
 
   const port = hypervisor.creationService.getPort()
   await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    }
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm])
   }))
 })
 
@@ -99,10 +87,7 @@ tape('getting a messages port', async t => {
 
   const port = hypervisor.creationService.getPort()
   await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    },
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm]),
     ports: ports
   }))
 })
@@ -120,10 +105,7 @@ tape('port binding', async t => {
 
   const port = hypervisor.creationService.getPort()
   const instance = await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    },
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm]),
     ports: [ports[1]]
   }))
   t.equals(Object.keys(instance.ports.ports).length, 1)
@@ -141,10 +123,7 @@ tape('get port', async t => {
   const ports = hypervisor.createChannel()
   const port = hypervisor.creationService.getPort()
   const instance = await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    },
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm]),
     ports: [ports[1]]
   }))
   t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
@@ -165,10 +144,7 @@ tape('delete port', async t => {
   const port = hypervisor.creationService.getPort()
   const ports = hypervisor.createChannel()
   const instance = await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    },
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm]),
     ports: [ports[1]]
   }))
   t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
@@ -191,10 +167,7 @@ tape('port unbinding', async t => {
   const port = hypervisor.creationService.getPort()
   const ports = hypervisor.createChannel()
   const instance = await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    },
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm]),
     ports: [ports[1]]
   }))
   t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
@@ -216,10 +189,7 @@ tape('reading message data', async t => {
   const port = hypervisor.creationService.getPort()
   const ports = hypervisor.createChannel()
   const instance = await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    },
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm]),
     ports: [ports[1]]
   }))
   t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
@@ -243,10 +213,7 @@ tape('send messages', async t => {
   const port = hypervisor.creationService.getPort()
   const ports = hypervisor.createChannel()
   const instance = await hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    },
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm]),
     ports: [ports[1]]
   }))
   t.equals(Object.keys(instance.ports.ports).length, 1, 'should bind port')
@@ -269,10 +236,7 @@ tape('referance map', async t => {
   const port = hypervisor.creationService.getPort()
   const ports = hypervisor.createChannel()
   hypervisor.send(port, new Message({
-    data: {
-      type: WasmContainer.typeId,
-      code: wasm
-    },
+    data: Buffer.concat([Buffer.from([0]), Buffer.from([WasmContainer.typeId]), wasm]),
     ports: [ports[1]]
   }))
 })
