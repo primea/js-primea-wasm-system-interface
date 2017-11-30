@@ -7,7 +7,7 @@ const WasmContainer = require('primea-wasm-container')
 const SystemInterface = require('../index.js')
 const testInterface = require('./testInterface.js')
 
-const level = require('level')
+const level = require('level-browserify')
 const RadixTree = require('dfinity-radix-tree')
 const db = level('./testdb')
 
