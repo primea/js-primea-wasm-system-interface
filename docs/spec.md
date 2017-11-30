@@ -8,7 +8,7 @@ We define the following types:
 - `i32ptr`: same as `i32` in WebAssembly, but treated as a pointer to a WebAssembly memory offset
 - `i32ref`: same as `i32` in WebAssembly, but treated as a referance to a Primea object
 
-### create_message
+### createMessage
 Messages can contain data which is read from memory starting at the `offset`
 and going for `len` bytes.
 
@@ -21,50 +21,43 @@ and going for `len` bytes.
 
 * **i32ref** the refence to a the message 
 
-### create_channel
-Creates a channel and writes two port referances to memory. Each port referance
-is an `i32`
+### mintCap
+Mints a new capability to message the minter
+**Returns**
+
+* **i32ref** the refence to a the capability 
+
+### storeCap
+Store a capability persistently at a given index 
 
 **Parameters**
 
-* `locA` **i32ptr**
-* `locB` **i32ptr** 
+* `index`  **i32** - an index to store the capability at
+* `capRef` **i32ref** - the referance to the capability being stored
 
-### bind_port
-Assigns a byte array to a port and starts to listen for incoming messages on it.
-The byte array is used as a name to retrieve the port in the future.
-
-**Parameters**
-
-* `offset`  **i32ptr** - a pointer to the location in memory to start reading from
-* `len` **i32** - the number of bytes to read starting from `offset`
-* `portRef` **i32ref** - the referance to the port being bounded
-
-### unbind_port
-Stops listening to a port and returns a referance to the port
+### loadCap
+Loads a capability from persistant storage at a given index 
 
 **Parameters**
 
-* `offset`  **i32ptr** - a pointer to the location in memory to start reading from
-* `len` **i32** - the number of bytes to read starting from `offset`
+* `index`  **i32**
 
 **Returns**
 
-* **i32ref** - the referance to the port being unbounded
+* **i32ref** - the referance to the capability being loaded
 
-### get_port
-Given the port's name this returns a refernce to the port. 
+### deleteCap
+Deletes a capability from persistant storage at a given index 
 
 **Parameters**
 
-* `offset`  **i32ptr** - a pointer to the location in memory to start reading from
-* `len` **i32** - the number of bytes to read starting from `offset`
+* `index`  **i32**
 
 **Returns**
 
-* **i32ref** - the referance to the port being unbounded
+* **i32ref** - the referance to the capability being loaded
 
-### get_message_data_len
+### messageDataLen
 Gets the number of bytes contain in the message's data payload
 
 **Parameters**
@@ -73,7 +66,7 @@ Gets the number of bytes contain in the message's data payload
 **Returns**
 * **i32**
 
-### load_message_data
+### loadMessageData
 Loads the message's data into memory
 
 **Parameters**
@@ -82,16 +75,16 @@ Loads the message's data into memory
 * `readOffset` **i32ptr**
 * `len` **i32**
 
-### add_port_to_message
-Add a port ref to a message
+### addCapToMessage
+Add a capability referance to a message
 
 **Parameters**
 * `message` **i32ref** - the referance to the message
-* `port` **i32ref** - the referance to the port
+* `port` **i32ref** - the referance to the capability
 
 
-### get_message_port_len
-get the number of ports contained in the message
+### messageCapLen
+get the number of caps contained in the message
 
 **Parameters**
 * `message` **i32ref** - the referance to the message
@@ -99,25 +92,25 @@ get the number of ports contained in the message
 **Returns**
 * **i32**
 
-### load_message_port_ref
-loads a port ref from the message
+### loadMessageCap
+loads a capabilities referance from the message
 
 **Parameters**
 * `message` **i32ref** - the referance to the message
-* `index` **i32** which port to in the message to load. The same port cannot be loaded twice
+* `index` **i32** which capability to in the message to load
 
 **Returns**
 * **i32**
 
-### send_message
-sends a message on a given port
+### sendMessage
+sends a message
 
 **Parameters**
 * `message` **i32ref** - the referance to the message
-* `port` **i32ref** - the referance to the port
+* `cap` **i32ref** - the referance to the capability to send the message
 
-### is_valid_ref
-test is an i32 is a valid ref or not
+### isValidRef
+test if a given i32 is a valid referance or not
 
 **Parameters**
 * `message` **i32ref**
@@ -125,8 +118,8 @@ test is an i32 is a valid ref or not
 **Returns**
 * **i32**
 
-### delete_ref
-deletes port or message refs 
+### deleteRef
+deletes a referance
 
 **Parameters**
 * `message` **i32ref**
