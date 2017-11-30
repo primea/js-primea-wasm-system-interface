@@ -1,26 +1,22 @@
 #include <stdbool.h>
 
-typedef int port;
+typedef int cap;
 
-extern void createChannel(port *, port *);
+extern cap mintCap();
 extern bool isValidRef(int);
 extern void deleteRef(int);
 extern void equals(int, int);
 
-port portA = 0;
-port portB = 0;
-
 void onCreation()
 {
-  createChannel(&portA, &portB);
-  equals(portA, 1);
-  equals(portB, 2);
+  cap c = mintCap();
+  equals(c, 1);
 
-  bool is_valid = isValidRef(portA);
+  bool is_valid = isValidRef(c);
   equals(is_valid, true);
 
-  deleteRef(portA);
+  deleteRef(c);
 
-  is_valid = isValidRef(portA);
+  is_valid = isValidRef(c);
   equals(is_valid, false);
 }

@@ -1,7 +1,7 @@
 typedef int message;
 
 extern int createMessage(const char*, int);
-extern int getMessageDataLen(message);
+extern int messageDataLen(message);
 extern void equals(int, int);
 
 int onCreation()
@@ -10,6 +10,6 @@ int onCreation()
   message m = createMessage(s, 8);
   equals(m, 1);
   
-  int len = getMessageDataLen(m);
+  int len = messageDataLen(m);
   equals(len, 8);
 }

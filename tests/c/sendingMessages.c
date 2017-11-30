@@ -1,21 +1,19 @@
-typedef int port;
+typedef int cap;
 typedef int message;
 
-extern port loadMessagePort(message, int index);
-extern void sendMessage(port, message);
-extern port getPort(const char *, int);
-extern void bindPort(const char *, int, port);
-
-const char * portName = "test";
+extern cap loadMessageCap(message, int index);
+extern void sendMessage(cap, message);
+extern cap loadCap(int index);
+extern void storeCap(int index, cap);
 
 void onCreation(message m)
 {
-  const port p = loadMessagePort(m, 0);
-  bindPort(portName, sizeof(portName), p);
+  const cap c = loadMessageCap(m, 0);
+  storeCap(0, c);
 }
 
 void onMessage(message m)
 {
-  port p = getPort(portName, sizeof(portName));
-  sendMessage(p, m);
+  cap c = loadCap(0);
+  sendMessage(c, m);
 }

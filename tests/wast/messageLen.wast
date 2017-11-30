@@ -4,7 +4,7 @@
   (type $FUNCSIG$ii (func (param i32) (result i32)))
   (import "env" "createMessage" (func $createMessage (param i32 i32) (result i32)))
   (import "test" "equals" (func $equals (param i32 i32)))
-  (import "env" "getMessageDataLen" (func $getMessageDataLen (param i32) (result i32)))
+  (import "env" "messageDataLen" (func $getMessageDataLen (param i32) (result i32)))
   (table 0 anyfunc)
   (memory $0 1)
   (data (i32.const 16) "\00asm\01\00\00\00\00")

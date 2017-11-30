@@ -1,59 +1,40 @@
+const Message = require('primea-message')
+
 module.exports = class SystemInterface {
   constructor (wasmContainer) {
     this.wasmContainer = wasmContainer
-    this.kernel = wasmContainer.kernel
-    this.ports = this.kernel.ports
+    this.actor = wasmContainer.actor
     this.referanceMap = wasmContainer.referanceMap
   }
 
   createMessage (offset, len) {
     const data = this.wasmContainer.getMemory(offset, len)
-    const message = this.kernel.createMessage({data: data})
+    const message = new Message({
+      data: data
+    })
     return this.wasmContainer.referanceMap.add(message)
   }
 
-  createChannel (locA, locB) {
-    const [portA, portB] = this.kernel.ports.createChannel()
-
-    const refA = this.wasmContainer.referanceMap.add(portA)
-    this.wasmContainer.setMemory(locA, [refA])
-
-    const refB = this.wasmContainer.referanceMap.add(portB)
-    this.wasmContainer.setMemory(locB, [refB])
+  mintCap (tag) {
+    const cap = this.actor.mintCap(tag)
+    return this.wasmContainer.referanceMap.add(cap)
   }
 
-  bindPort (offset, length, portRef) {
-    const port = this.wasmContainer.referanceMap.get(portRef)
-    let name = this.wasmContainer.getMemory(offset, length)
-    name = Buffer.from(name).toString()
-    const promise = this.kernel.ports.bind(name, port)
-    this.wasmContainer.pushOpsQueue(promise)
+  storeCap (index, capRef) {
+    const cap = this.wasmContainer.referanceMap.get(capRef)
+    this.actor.caps.store(index, cap)
   }
 
-  unbindPort (offset, length) {
-    let name = this.wasmContainer.getMemory(offset, length)
-    name = Buffer.from(name).toString()
-    const port = this.kernel.ports.get(name)
-    const promise = this.kernel.ports.unbind(name)
-    this.wasmContainer.pushOpsQueue(promise)
-    return this.wasmContainer.referanceMap.add(port)
+  deleteCap (index) {
+    this.actor.caps.delete(index)
   }
 
-  getPort (offset, length) {
-    let name = this.wasmContainer.getMemory(offset, length)
-    name = Buffer.from(name).toString()
-    const port = this.kernel.ports.get(name)
-    return this.wasmContainer.referanceMap.add(port)
+  loadCap (index) {
+    const cap = this.actor.caps.load(index)
+    return this.wasmContainer.referanceMap.add(cap)
   }
 
-  deletePort (offset, length) {
-    let name = this.wasmContainer.getMemory(offset, length)
-    name = Buffer.from(name).toString()
-    const promise = this.kernel.ports.delete(name)
-    this.wasmContainer.pushOpsQueue(promise)
-  }
-
-  getMessageDataLen (messageRef) {
+  messageDataLen (messageRef) {
     const message = this.referanceMap.get(messageRef)
     return message.data.length
   }
@@ -64,28 +45,29 @@ module.exports = class SystemInterface {
     this.wasmContainer.setMemory(writeOffset, data)
   }
 
-  addPortToMessage (messageRef, portRef) {
+  addCapToMessage (messageRef, capRef) {
     const message = this.referanceMap.get(messageRef)
-    const port = this.referanceMap.get(portRef)
-    message.ports.push(port)
+    const cap = this.referanceMap.get(capRef)
+    message.caps.push(cap)
   }
 
-  messagePortLen (messageRef) {
+  messageCapLen (messageRef) {
     const message = this.referanceMap.get(messageRef)
-    return message.ports.length
+    return message.caps.length
   }
 
-  loadMessagePort (messageRef, index) {
+  loadMessageCap (messageRef, index) {
     const message = this.referanceMap.get(messageRef)
-    const port = message.ports[index]
-    delete message.ports[index]
-    return this.referanceMap.add(port)
+    const caps = message.caps[index]
+    // TODO: check if cap exists
+    delete message.caps[index]
+    return this.referanceMap.add(caps)
   }
 
-  sendMessage (portRef, messageRef) {
-    const port = this.referanceMap.get(portRef)
+  sendMessage (capRef, messageRef) {
+    const cap = this.referanceMap.get(capRef)
     const message = this.referanceMap.get(messageRef)
-    this.kernel.send(port, message)
+    this.actor.send(cap, message)
   }
 
   deleteRef (ref) {
