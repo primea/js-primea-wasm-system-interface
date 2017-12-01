@@ -125,8 +125,10 @@ loads a capabilities referance from the message
 sends a message
 
 **Parameters**
-* `message` **i32ref** - the referance to the message
+
 * `cap` **i32ref** - the referance to the capability to send the message
+* `message` **i32ref** - the referance to the message
+* `ticks` **i32** - the number of ticks to allocate to this message
 
 ### messageDataLen
 Gets the number of bytes contain in the message's data payload
