@@ -199,7 +199,7 @@ tape('send messages', async t => {
     caps: [captureCap]
   }))
   const instance = await hypervisor.getActor(wasmCap.destId)
-  t.equals(instance.caps.load(0), captureCap)
+  t.equals(instance.caps.load(0), captureCap, 'should have cap')
 
   const message2 = new Message()
   await instance.runMessage(message2)
@@ -219,4 +219,30 @@ tape('referance map', async t => {
     data: wasm,
     caps: [{}]
   }))
+})
+
+tape('store data', async t => {
+  t.plan(3)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/storeData.wasm`)
+
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
+  })
+
+  const cap = await hypervisor.createActor(WasmContainer.typeId, new Message({
+    data: wasm
+  }))
+  // await hypervisor.createStateRoot()
+  let value = await hypervisor.tree.get(Buffer.concat([cap.destId, Buffer.alloc(4)]))
+  t.equals(Buffer.from(value.value).toString(), 'test data')
+
+  await hypervisor.send(cap, new Message())
+  // wait untill the hypervisor is done
+  await hypervisor.scheduler.wait(Infinity)
+
+  value = await hypervisor.tree.get(Buffer.concat([cap.destId, Buffer.alloc(4)]))
+  t.equals(value.value, undefined, 'should delete data')
+  t.end()
 })

@@ -3,8 +3,10 @@ typedef int message;
 
 extern cap loadMessageCap(message, int index);
 extern void sendMessage(cap, message);
-extern cap loadCap(int index);
+extern void loadCap(int index, void (*callback)(cap));
 extern void storeCap(int index, cap);
+
+message messageToSend;
 
 void onCreation(message m)
 {
@@ -12,8 +14,12 @@ void onCreation(message m)
   storeCap(0, c);
 }
 
+void loadedCap (cap c) {
+  sendMessage(c, messageToSend);
+}
+
 void onMessage(message m)
 {
-  cap c = loadCap(0);
-  sendMessage(c, m);
+  messageToSend = m;
+  loadCap(0, &loadedCap);
 }

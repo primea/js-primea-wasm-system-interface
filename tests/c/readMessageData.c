@@ -7,7 +7,6 @@ extern void loadMessageData(message, int readOffset, char *, int len);
 extern int messageDataLen(message);
 extern void equals(int, int);
 
-
 void onCreation(message m)
 {
   // bind the intial cap

@@ -13,7 +13,7 @@ void onCreation()
   message m = createMessage(s, 8);
   cap capA = mintCap();
   addCapToMessage(m, capA);
-  const int len = messageCapsLen(m);
+  const int len = messageCapLen(m);
   equals(len, 1);
   equals(capA, 2);
 }

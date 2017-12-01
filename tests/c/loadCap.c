@@ -3,10 +3,12 @@ typedef int message;
 
 extern cap loadMessageCap(message, int index);
 extern void storeCap(int index, cap);
-extern cap loadCap(int);
+extern void loadCap(int index, void (*callback)(cap));
 extern void equals(int, int);
 
-const char * capName = "test";
+void loadedCap (cap c) {
+  equals(c, 1);
+}
 
 void onCreation(message m)
 {
@@ -16,6 +18,6 @@ void onCreation(message m)
 
 void onMessage(message m)
 {
-  const cap p = loadCap(0);
-  equals(p, 1);
+  loadCap(0, &loadedCap);
 }
+

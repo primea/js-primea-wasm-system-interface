@@ -3,7 +3,7 @@ typedef int message;
 
 extern cap loadMessageCap(message, int index);
 extern void storeCap(int index, cap);
-extern cap deleteCap(int index, int);
+extern void deleteCap(int index, int);
 
 void onCreation(message m)
 {
