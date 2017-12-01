@@ -9,15 +9,15 @@ We define the following types:
 
 
 ## Storage
-### storeData
+### store
 Store a data persistently at a given index 
 
 **Parameters**
 
 * `index`  **i32** - an index to store the capability at
-* `capRef` **i32ref** - the referance to the capability being stored
+* `msgRef` **i32ref** - the referance to the message being stored
 
-### loadData
+### load
 Loads a data from persistant storage at a given index 
 
 **Parameters**
@@ -29,47 +29,12 @@ Loads a data from persistant storage at a given index
 
 * **i32ref** - the referance to the capability being loaded
 
-### deleteData
-Deletes data from persistant storage at a given index 
+### delete
+Deletes a message from persistant storage at a given index 
 
 **Parameters**
 
 * `index`  **i32**
-
-**Returns**
-
-* **i32ref** - the referance to the capability being loaded
-
-### storeCap
-Store a capability persistently at a given index 
-
-**Parameters**
-
-* `index`  **i32** - an index to store the capability at
-* `capRef` **i32ref** - the referance to the capability being stored
-
-### loadCap
-Loads a capability from persistant storage at a given index 
-
-**Parameters**
-
-* `index`  **i32**
-* `callback` **i32ptr** - the callback function which is given an `i32ref` of the load capability
-
-**Returns**
-
-* **i32ref** - the referance to the capability being loaded
-
-### deleteCap
-Deletes a capability from persistant storage at a given index 
-
-**Parameters**
-
-* `index`  **i32**
-
-**Returns**
-
-* **i32ref** - the referance to the capability being loaded
 
 ## Messages
 ### createMessage
