@@ -10,19 +10,20 @@ extern void equals(int, int);
 
 // store some data on creation
 const char to_store[] = "test data";
+const int MY_STORAGE_KEY = 0;
 void onCreation()
 {
   message m = createMessage(to_store, sizeof(to_store) - 1);
-  storeData(0, m);
+  storeData(MY_STORAGE_KEY, m);
 }
 
 void loadedDataCallback (message c) {
   equals(messageDataLen(c), sizeof(to_store) - 1);
-  deleteData(0);
+  deleteData(MY_STORAGE_KEY);
 }
 
 void onMessage()
 {
-  loadData(0, &loadedDataCallback);
+  loadData(MY_STORAGE_KEY, &loadedDataCallback);
 }
 
