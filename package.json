@@ -19,7 +19,7 @@
     "nyc": "^11.3.0",
     "primea-hypervisor": "0.4.3",
     "primea-message": "0.6.1",
-    "primea-wasm-container": "0.3.3",
+    "primea-wasm-container": "0.3.4",
     "standard": "^10.0.3",
     "tape": "^4.6.3",
     "wast2wasm": "0.0.1"
