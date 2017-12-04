@@ -5,7 +5,6 @@ module.exports = class SystemInterface {
     this.wasmContainer = wasmContainer
     this.actor = wasmContainer.actor
     this.referanceMap = wasmContainer.referanceMap
-    this.store = this.actor.hypervisor.tree
   }
 
   createMessage (offset, len) {
@@ -21,41 +20,23 @@ module.exports = class SystemInterface {
     return this.wasmContainer.referanceMap.add(cap)
   }
 
-  storeCap (index, capRef) {
-    const cap = this.wasmContainer.referanceMap.get(capRef)
-    this.actor.caps.store(index, cap)
-  }
-
-  deleteCap (index) {
-    this.actor.caps.delete(index)
-  }
-
-  loadCap (index, cb) {
-    const cap = this.actor.caps.load(index)
-    const capRef = this.wasmContainer.referanceMap.add(cap)
-    this.wasmContainer.execute(cb, capRef)
-  }
-
-  storeData (index, messageRef) {
+  storeMessage (index, messageRef) {
     const message = this.wasmContainer.referanceMap.get(messageRef)
-    let key = Buffer.alloc(4)
-    key.writeUInt32LE(index)
-    key = Buffer.concat([this.actor.id, key])
-    this.store.set(key, message.data)
+    let key = Buffer.alloc(5)
+    key.writeUInt32LE(index, 1)
+    this.actor.state.set(key, message)
   }
 
-  deleteData (index) {
-    let key = Buffer.alloc(4)
-    key.writeUInt32LE(index)
-    key = Buffer.concat([this.actor.id, key])
-    this.store.delete(key)
+  deleteMessage (index) {
+    let key = Buffer.alloc(5)
+    key.writeUInt32LE(index, 1)
+    this.actor.state.delete(key)
   }
 
-  async loadData (index, cb) {
-    let key = Buffer.alloc(4)
-    key.writeUInt32LE(index)
-    key = Buffer.concat([this.actor.id, key])
-    const promise = this.store.get(key)
+  async loadMessage (index, cb) {
+    let key = Buffer.alloc(5)
+    key.writeUInt32LE(index, 1)
+    const promise = this.actor.state.get(key)
     await this.wasmContainer.pushOpsQueue(promise)
     const value = await promise
     const message = new Message({

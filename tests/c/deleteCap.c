@@ -1,17 +1,20 @@
-typedef int cap;
 typedef int message;
 
-extern cap loadMessageCap(message, int index);
-extern void storeCap(int index, cap);
-extern void deleteCap(int index, int);
+extern void deleteMessage(int index);
+extern void storeMessage(int index, message);
+extern void loadMessage(int index, void (*callback)(message));
+
+void loadCb (message m) {
+  deleteMessage(0);
+}
 
 void onCreation(message m)
 {
-  const cap p = loadMessageCap(m, 0);
-  storeCap(0, p);
+  storeMessage(0, m);
 }
 
 void onMessage(message m)
 {
-  deleteCap(0, 4);
+  loadMessage(0, &loadCb);
 }
+

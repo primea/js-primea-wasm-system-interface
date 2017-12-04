@@ -13,13 +13,13 @@
   "license": "MPL-2.0",
   "devDependencies": {
     "coveralls": "^3.0.0",
-    "dfinity-radix-tree": "0.0.6",
+    "dfinity-radix-tree": "0.0.8",
     "documentation": "^5.3.3",
     "level-browserify": "^1.1.1",
     "nyc": "^11.3.0",
-    "primea-hypervisor": "0.4.2",
+    "primea-hypervisor": "0.4.3",
     "primea-message": "0.6.1",
-    "primea-wasm-container": "0.3.2",
+    "primea-wasm-container": "0.3.3",
     "standard": "^10.0.3",
     "tape": "^4.6.3",
     "wast2wasm": "0.0.1"

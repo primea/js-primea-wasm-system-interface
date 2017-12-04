@@ -2,22 +2,22 @@ typedef int cap;
 typedef int message;
 
 extern cap loadMessageCap(message, int index);
-extern void storeCap(int index, cap);
-extern void loadCap(int index, void (*callback)(cap));
+extern void storeMessage(int index, message);
+extern void loadMessage(int index, void (*callback)(cap));
 extern void equals(int, int);
 
-void loadedCap (cap c) {
-  equals(c, 1);
+void loadCb (message m) {
+  const cap p = loadMessageCap(m, 0);
+  equals(p, 2);
 }
 
 void onCreation(message m)
 {
-  const cap p = loadMessageCap(m, 0);
-  storeCap(0, p);
+  storeMessage(0, m);
 }
 
 void onMessage(message m)
 {
-  loadCap(0, &loadedCap);
+  loadMessage(0, &loadCb);
 }
 
