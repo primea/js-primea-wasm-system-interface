@@ -9,16 +9,16 @@ We define the following types:
 
 
 ## Storage
-### store
-Store a data persistently at a given index 
+### storeMessage
+Store a message along with it's data and associated capablilities persistently at a given index 
 
 **Parameters**
 
 * `index`  **i32** - an index to store the capability at
 * `msgRef` **i32ref** - the reference to the message being stored
 
-### load
-Loads a data from persistant storage at a given index 
+### loadMessage
+Loads a message along with it's data and associated capablilities from persistant storage at a given index 
 
 **Parameters**
 
@@ -29,7 +29,7 @@ Loads a data from persistant storage at a given index
 
 * **i32ref** - the reference to the capability being loaded
 
-### delete
+### deleteMessage
 Deletes a message from persistant storage at a given index 
 
 **Parameters**
