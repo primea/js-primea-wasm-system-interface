@@ -104,6 +104,13 @@ Gets the number of bytes contain in the message's data payload
 **Returns**
 * **i32**
 
+### getNextMessage
+Gets the next message from the inbox, if any, while maintaing the current state of the VM.
+
+**Parameters**
+* `timeout` **i32** - The amount of ticks to wait before timeing out. 
+* `timeout_callback` **i32ptr**  - the callback function which is called if `getNextMessage` timseout
+
 ## references
 ### mintCap
 Mints a new capability to message the minter
