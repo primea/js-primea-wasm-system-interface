@@ -238,3 +238,31 @@ tape('getting next message', async t => {
   const message1 = new Message()
   hypervisor.send(cap, message1)
 })
+
+tape.skip('responses', async t => {
+  t.plan(1)
+  const hypervisor = new Hypervisor(tree)
+
+  class CaptureContainer extends AbstractContainer {
+    onMessage (m) {
+      t.true(m, 'should receive message')
+    }
+
+    static get typeId () {
+      return 9
+    }
+  }
+
+  const wasm = fs.readFileSync(`${__dirname}/wasm/sendingMessages.wasm`)
+  hypervisor.registerContainer(CaptureContainer)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
+  })
+
+  const responseCap = await hypervisor.createActor(CaptureContainer.typeId, new Message())
+  await hypervisor.createActor(WasmContainer.typeId, new Message({
+    data: wasm,
+    caps: [captureCap]
+  }))
+})

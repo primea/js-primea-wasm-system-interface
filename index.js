@@ -82,6 +82,14 @@ module.exports = class SystemInterface {
     this.actor.send(cap, message)
   }
 
+  respondToMessage (messageRef, responseRef) {
+    const message = this.referanceMap.get(messageRef)
+    const response = this.referanceMap.get(responseRef)
+    const cap = message.responseCap
+    delete message.responseCap
+    this.actor.send(cap, response)
+  }
+
   async getNextMessage (timeout, cb) {
     const promise = this.actor.inbox.nextMessage(timeout)
     await this.wasmContainer.pushOpsQueue(promise)
