@@ -82,6 +82,19 @@ module.exports = class SystemInterface {
     this.actor.send(cap, message)
   }
 
+  async getNextMessage (timeout, cb) {
+    const promise = this.actor.inbox.nextMessage(timeout)
+    await this.wasmContainer.pushOpsQueue(promise)
+    const message = await promise
+
+    if (message) {
+      const messageRef = this.wasmContainer.referanceMap.add(message)
+      this.wasmContainer.instance.exports.onMessage(messageRef)
+    } else {
+      this.wasmContainer.execute(cb)
+    }
+  }
+
   deleteRef (ref) {
     this.referanceMap.delete(ref)
   }

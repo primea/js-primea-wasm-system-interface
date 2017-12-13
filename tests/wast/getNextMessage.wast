@@ -1,0 +1,51 @@
+(module
+ (type $FUNCSIG$vii (func (param i32 i32)))
+ (type $FUNCSIG$v (func))
+ (import "test" "equals" (func $equals (param i32 i32)))
+ (import "env" "getNextMessage" (func $getNextMessage (param i32 i32)))
+ (table (export "callbacks") 2 2 anyfunc)
+ (elem (i32.const 0) $__wasm_nullptr $timeout)
+ (memory $0 1)
+ (data (i32.const 12) "\00\00\00\00")
+ (export "memory" (memory $0))
+ (export "timeout" (func $timeout))
+ (export "onCreation" (func $onCreation))
+ (export "onMessage" (func $onMessage))
+ (func $timeout (; 2 ;) (type $FUNCSIG$v)
+  (call $equals
+   (i32.load offset=12
+    (i32.const 0)
+   )
+   (i32.const 2)
+  )
+ )
+ (func $onCreation (; 3 ;) (param $0 i32)
+  (i32.store offset=12
+   (i32.const 0)
+   (i32.const 1)
+  )
+  (call $getNextMessage
+   (i32.const 80)
+   (i32.const 1)
+  )
+ )
+ (func $onMessage (; 4 ;) (param $0 i32)
+  (call $equals
+   (i32.load offset=12
+    (i32.const 0)
+   )
+   (i32.const 1)
+  )
+  (i32.store offset=12
+   (i32.const 0)
+   (i32.const 2)
+  )
+  (call $getNextMessage
+   (i32.const 0)
+   (i32.const 1)
+  )
+ )
+ (func $__wasm_nullptr (; 5 ;) (type $FUNCSIG$v)
+  (unreachable)
+ )
+)

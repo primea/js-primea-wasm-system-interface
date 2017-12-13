@@ -87,7 +87,7 @@ tape('getting a messages cap', async t => {
 })
 
 tape('caps storing', async t => {
-  t.plan(1)
+  // t.plan(1)
   const hypervisor = new Hypervisor(tree)
   const wasm = fs.readFileSync(`${__dirname}/wasm/storeCap.wasm`)
   hypervisor.registerContainer(WasmContainer, {
@@ -101,8 +101,10 @@ tape('caps storing', async t => {
     caps: [toStore]
   }))
   const instance = await hypervisor.getActor(cap.destId)
+  await hypervisor.scheduler.wait(Infinity)
   const msg = await instance.state.get(Buffer.from([0, 1, 0, 0, 0]))
   t.equals(msg.caps[0], toStore)
+  t.end()
 })
 
 tape('load cap', async t => {
@@ -120,6 +122,7 @@ tape('load cap', async t => {
     caps: [toStore]
   }))
   const instance = await hypervisor.getActor(cap.destId)
+  await hypervisor.scheduler.wait(Infinity)
   const msg = await instance.state.get(Buffer.from([0, 0, 0, 0, 0]))
   t.equals(msg.caps[0], toStore)
 
@@ -143,6 +146,7 @@ tape('delete cap', async t => {
   }))
 
   const instance = await hypervisor.getActor(cap.destId)
+  await hypervisor.scheduler.wait(Infinity)
   let msg = await instance.state.get(Buffer.from([0, 0, 0, 0, 0]))
   t.equals(msg.caps[0], toStore)
 
@@ -167,7 +171,6 @@ tape('reading message data', async t => {
   }))
 
   const instance = await hypervisor.getActor(cap.destId)
-
   const message2 = new Message({
     data: new Uint8Array([1, 2, 3, 4, 5])
   })
@@ -216,4 +219,22 @@ tape('referance map', async t => {
     data: wasm,
     caps: [{}]
   }))
+})
+
+tape('getting next message', async t => {
+  t.plan(2)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/getNextMessage.wasm`)
+
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
+  })
+
+  const cap = await hypervisor.createActor(WasmContainer.typeId, new Message({
+    data: wasm
+  }))
+
+  const message1 = new Message()
+  hypervisor.send(cap, message1)
 })
