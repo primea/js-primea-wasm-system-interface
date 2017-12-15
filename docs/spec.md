@@ -104,6 +104,15 @@ Gets the number of bytes contain in the message's data payload
 **Returns**
 * **i32**
 
+### getMessageTag
+Gets the tag of the capabilbilty that was used to send the message
+
+**Parameters**
+* `message` **i32ref** - The reference to the message
+
+**Returns**
+* **i32**
+
 ### getNextMessage
 Gets the next message from the inbox, if any, while maintaing the current state of the VM.
 
