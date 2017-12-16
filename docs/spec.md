@@ -121,7 +121,7 @@ Gets the next message from the inbox, if any, while maintaing the current state 
 * `timeout` **i32** - The amount of ticks to wait before timeing out. 
 * `timeout_callback` **i32ptr**  - the callback function which is called if `getNextMessage` timeseout
 
-### Respond
+### respond
 Sends a response to the current message using its response capability.
 
 **Parameters**
