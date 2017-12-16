@@ -45,6 +45,7 @@ and going for `len` bytes.
 
 * `offset`  **i32ptr** - a pointer to the location in memory to start reading from
 * `len` **i32** - the number of bytes to read starting from `offset`
+* `responseCap` **i32ref** - A capability that is send to send a response. If no response is desired then a negitive integer can be used instead of a referance.
 
 **Returns**
 
@@ -118,7 +119,13 @@ Gets the next message from the inbox, if any, while maintaing the current state 
 
 **Parameters**
 * `timeout` **i32** - The amount of ticks to wait before timeing out. 
-* `timeout_callback` **i32ptr**  - the callback function which is called if `getNextMessage` timseout
+* `timeout_callback` **i32ptr**  - the callback function which is called if `getNextMessage` timeseout
+
+### Respond
+Sends a response to the current message using its response capability.
+
+**Parameters**
+* `message` **i32Ref** - The message to send in response.
 
 ## references
 ### mintCap
