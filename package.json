@@ -17,14 +17,14 @@
     "documentation": "^5.3.5",
     "level-browserify": "^1.1.1",
     "nyc": "^11.3.0",
-    "primea-hypervisor": "0.4.4",
+    "primea-hypervisor": "0.4.5",
     "primea-message": "0.6.1",
-    "primea-wasm-container": "0.3.4",
     "standard": "^10.0.3",
     "tape": "^4.6.3",
     "wast2wasm": "0.0.1"
   },
   "dependencies": {
+    "primea-wasm-container": "0.3.4",
     "safe-buffer": "^5.1.1"
   }
 }

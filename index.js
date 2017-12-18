@@ -1,4 +1,5 @@
 const Message = require('primea-message')
+const WasmContainer = require('primea-wasm-container')
 
 module.exports = class SystemInterface {
   constructor (wasmContainer) {
@@ -7,11 +8,14 @@ module.exports = class SystemInterface {
     this.referanceMap = wasmContainer.referanceMap
   }
 
-  createMessage (offset, len) {
+  createMessage (offset, len, responseCap) {
     const data = this.wasmContainer.getMemory(offset, len)
     const message = new Message({
       data: data
     })
+    if (responseCap > -1) {
+      message.responseCap = this.wasmContainer.referanceMap.get(responseCap)
+    }
     return this.wasmContainer.referanceMap.add(message)
   }
 
@@ -76,21 +80,38 @@ module.exports = class SystemInterface {
     return this.referanceMap.add(caps)
   }
 
+  getMessageTag (messageRef) {
+    const message = this.referanceMap.get(messageRef)
+    return message.tag
+  }
+
   sendMessage (capRef, messageRef) {
     const cap = this.referanceMap.get(capRef)
     const message = this.referanceMap.get(messageRef)
     this.actor.send(cap, message)
   }
 
-  respondToMessage (messageRef, responseRef) {
-    const message = this.referanceMap.get(messageRef)
+  respond (responseRef) {
+    const message = this.actor.inbox.currentMessage
     const response = this.referanceMap.get(responseRef)
     const cap = message.responseCap
     delete message.responseCap
     this.actor.send(cap, response)
   }
 
+  createActor (messageRef, cb) {
+    const message = this.referanceMap.get(messageRef)
+    this.actor.createActor(WasmContainer.typeId, message)
+  }
+
   async getNextMessage (timeout, cb) {
+    const currentMessage = this.actor.inbox.currentMessage
+
+    if (currentMessage && currentMessage.responseCap) {
+      this.actor.send(currentMessage.responseCap, new Message())
+      delete currentMessage.responseCap
+    }
+
     const promise = this.actor.inbox.nextMessage(timeout)
     await this.wasmContainer.pushOpsQueue(promise)
     const message = await promise

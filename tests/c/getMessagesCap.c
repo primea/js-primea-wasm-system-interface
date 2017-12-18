@@ -5,7 +5,7 @@ extern int messageCapLen(message);
 extern cap loadMessageCap(message, int index);
 extern void equals(int, int);
 
-void onCreation(message m)
+void onMessage(message m)
 {
   const int len = messageCapLen(m);
   equals(len, 2);
