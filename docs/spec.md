@@ -45,7 +45,7 @@ and going for `len` bytes.
 
 * `offset`  **i32ptr** - a pointer to the location in memory to start reading from
 * `len` **i32** - the number of bytes to read starting from `offset`
-* `responseCap` **i32ref** - A capability that is send to send a response. If no response is desired then a negitive integer can be used instead of a referance.
+* `responseCap` **i32ref** - A capability that is used to send a response. If no response is desired then a negitive integer can be used instead of a referance.
 
 **Returns**
 
