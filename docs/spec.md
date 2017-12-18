@@ -136,6 +136,7 @@ Creates a new actor given a message. A message's data field must contain the was
 ## references
 ### mintCap
 Mints a new capability to message the minter
+
 **Returns**
 
 * **i32ref** the refence to a the capability 
