@@ -127,6 +127,12 @@ Sends a response to the current message using its response capability.
 **Parameters**
 * `message` **i32Ref** - The message to send in response.
 
+### createActor
+Creates a new actor given a message. A message's data field must contain the wasm binary of the new actor.
+
+**Parameters**
+* `message` **i32Ref** - The message to send in response.
+
 ## references
 ### mintCap
 Mints a new capability to message the minter
