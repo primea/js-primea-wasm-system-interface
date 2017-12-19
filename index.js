@@ -8,15 +8,18 @@ module.exports = class SystemInterface {
     this.referanceMap = wasmContainer.referanceMap
   }
 
-  createMessage (offset, len, responseCap) {
+  createMessage (offset, len) {
     const data = this.wasmContainer.getMemory(offset, len)
     const message = new Message({
       data: data
     })
-    if (responseCap > -1) {
-      message.responseCap = this.wasmContainer.referanceMap.get(responseCap)
-    }
     return this.wasmContainer.referanceMap.add(message)
+  }
+
+  setResponseCap (messageRef, capRef) {
+    const message = this.wasmContainer.referanceMap.get(messageRef)
+    const cap = this.wasmContainer.referanceMap.get(capRef)
+    message.responseCap = cap
   }
 
   mintCap (tag) {
