@@ -1,4 +1,5 @@
 const Message = require('primea-message')
+const Cap = require('primea-capability')
 const WasmContainer = require('primea-wasm-container')
 
 module.exports = class SystemInterface {
@@ -17,8 +18,8 @@ module.exports = class SystemInterface {
   }
 
   setResponseCap (messageRef, capRef) {
-    const message = this.wasmContainer.referanceMap.get(messageRef)
-    const cap = this.wasmContainer.referanceMap.get(capRef)
+    const message = this.wasmContainer.referanceMap.get(messageRef, Message)
+    const cap = this.wasmContainer.referanceMap.get(capRef, Cap)
     message.responseCap = cap
   }
 
@@ -28,7 +29,7 @@ module.exports = class SystemInterface {
   }
 
   storeMessage (index, messageRef) {
-    const message = this.wasmContainer.referanceMap.get(messageRef)
+    const message = this.wasmContainer.referanceMap.get(messageRef, Message)
     let key = Buffer.alloc(5)
     key.writeUInt32LE(index, 1)
     this.actor.state.set(key, message)
@@ -45,65 +46,63 @@ module.exports = class SystemInterface {
     key.writeUInt32LE(index, 1)
     const promise = this.actor.state.get(key)
     await this.wasmContainer.pushOpsQueue(promise)
-    const value = await promise
-    const message = new Message({
-      data: value.value
-    })
+    const message = await promise
     const messageRef = this.wasmContainer.referanceMap.add(message)
     this.wasmContainer.execute(cb, messageRef)
   }
 
   messageDataLen (messageRef) {
-    const message = this.referanceMap.get(messageRef)
+    const message = this.referanceMap.get(messageRef, Message)
     return message.data.length
   }
 
   loadMessageData (messageRef, writeOffset, readOffset, len) {
-    const message = this.referanceMap.get(messageRef)
+    const message = this.referanceMap.get(messageRef, Message)
     const data = message.data.slice(readOffset, len)
     this.wasmContainer.setMemory(writeOffset, data)
   }
 
   addCapToMessage (messageRef, capRef) {
-    const message = this.referanceMap.get(messageRef)
+    const message = this.referanceMap.get(messageRef, Message)
     const cap = this.referanceMap.get(capRef)
     message.caps.push(cap)
   }
 
   messageCapLen (messageRef) {
-    const message = this.referanceMap.get(messageRef)
+    const message = this.referanceMap.get(messageRef, Message)
     return message.caps.length
   }
 
   loadMessageCap (messageRef, index) {
-    const message = this.referanceMap.get(messageRef)
-    const caps = message.caps[index]
-    // TODO: check if cap exists
-    delete message.caps[index]
-    return this.referanceMap.add(caps)
+    const message = this.referanceMap.get(messageRef, Message)
+    const cap = message.caps[index]
+    if (!cap) {
+      throw new Error('no capability at this index')
+    }
+    return this.referanceMap.add(cap)
   }
 
   getMessageTag (messageRef) {
-    const message = this.referanceMap.get(messageRef)
+    const message = this.referanceMap.get(messageRef, Message)
     return message.tag
   }
 
   sendMessage (capRef, messageRef) {
     const cap = this.referanceMap.get(capRef)
-    const message = this.referanceMap.get(messageRef)
+    const message = this.referanceMap.get(messageRef, Message)
     this.actor.send(cap, message)
   }
 
   respond (responseRef) {
     const message = this.actor.inbox.currentMessage
-    const response = this.referanceMap.get(responseRef)
+    const response = this.referanceMap.get(responseRef, Message)
     const cap = message.responseCap
     delete message.responseCap
     this.actor.send(cap, response)
   }
 
   createActor (messageRef, cb) {
-    const message = this.referanceMap.get(messageRef)
+    const message = this.referanceMap.get(messageRef, Message)
     this.actor.createActor(WasmContainer.typeId, message)
   }
 

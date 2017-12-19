@@ -124,9 +124,12 @@ tape('load cap', async t => {
   const instance = await hypervisor.getActor(cap.destId)
   await hypervisor.scheduler.wait(Infinity)
   const msg = await instance.state.get(Buffer.from([0, 0, 0, 0, 0]))
-  t.equals(msg.caps[0], toStore)
+  t.equals(msg.caps[0], toStore, 'store cap')
 
-  const message = new Message()
+  const message = new Message({
+    data: 'test',
+    caps: [toStore]
+  })
   await instance.runMessage(message)
 })
 
@@ -361,5 +364,22 @@ tape('creation test', async t => {
 
   await hypervisor.createActor(WasmContainer.typeId, new Message({
     data: wasm
+  }))
+})
+
+tape('loading caps from messages that dont exist', async t => {
+  t.plan(1)
+  const hypervisor = new Hypervisor(tree)
+  const wasm = fs.readFileSync(`${__dirname}/wasm/invalidIndex.wasm`)
+
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
+  })
+
+  await hypervisor.createActor(WasmContainer.typeId, new Message({
+    data: wasm
+  }).on('execution:error', e => {
+    t.pass('should error')
   }))
 })

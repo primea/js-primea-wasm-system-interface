@@ -24,7 +24,8 @@
     "wast2wasm": "0.0.1"
   },
   "dependencies": {
-    "primea-wasm-container": "0.3.4",
+    "primea-capability": "0.0.1",
+    "primea-wasm-container": "0.3.5",
     "safe-buffer": "^5.1.1"
   }
 }
