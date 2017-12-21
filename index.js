@@ -17,12 +17,6 @@ module.exports = class SystemInterface {
     return this.wasmContainer.referanceMap.add(message)
   }
 
-  setResponseCap (messageRef, capRef) {
-    const message = this.wasmContainer.referanceMap.get(messageRef, Message)
-    const cap = this.wasmContainer.referanceMap.get(capRef, Cap)
-    message.responseCap = cap
-  }
-
   mintCap (tag) {
     const cap = this.actor.mintCap(tag)
     return this.wasmContainer.referanceMap.add(cap)
@@ -93,27 +87,12 @@ module.exports = class SystemInterface {
     this.actor.send(cap, message)
   }
 
-  respond (responseRef) {
-    const message = this.actor.inbox.currentMessage
-    const response = this.referanceMap.get(responseRef, Message)
-    const cap = message.responseCap
-    delete message.responseCap
-    this.actor.send(cap, response)
-  }
-
   createActor (messageRef, cb) {
     const message = this.referanceMap.get(messageRef, Message)
     this.actor.createActor(WasmContainer.typeId, message)
   }
 
   async getNextMessage (timeout, cb) {
-    const currentMessage = this.actor.inbox.currentMessage
-
-    if (currentMessage && currentMessage.responseCap) {
-      this.actor.send(currentMessage.responseCap, new Message())
-      delete currentMessage.responseCap
-    }
-
     const promise = this.actor.inbox.nextMessage(timeout)
     await this.wasmContainer.pushOpsQueue(promise)
     const message = await promise

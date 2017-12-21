@@ -208,34 +208,6 @@ tape('send messages', async t => {
   }))
 })
 
-tape('send messages with a response cap', async t => {
-  t.plan(2)
-  const hypervisor = new Hypervisor(tree)
-
-  class CaptureContainer extends AbstractContainer {
-    onMessage (m) {
-      t.true(m, 'should receive message')
-    }
-
-    static get typeId () {
-      return 9
-    }
-  }
-
-  const wasm = fs.readFileSync(`${__dirname}/wasm/sendingMessagesWithRcap.wasm`)
-  hypervisor.registerContainer(CaptureContainer)
-  hypervisor.registerContainer(WasmContainer, {
-    env: SystemInterface,
-    test: testInterface(t)
-  })
-
-  const captureCap = await hypervisor.createActor(CaptureContainer.typeId, new Message())
-  await hypervisor.createActor(WasmContainer.typeId, new Message({
-    data: wasm,
-    caps: [captureCap]
-  }))
-})
-
 tape('referance map', async t => {
   t.plan(3)
   const hypervisor = new Hypervisor(tree)
@@ -290,70 +262,8 @@ tape('getting next message', async t => {
   hypervisor.send(cap, message1)
 })
 
-tape('responses', async t => {
-  t.plan(2)
-  const hypervisor = new Hypervisor(tree)
-
-  class CaptureContainer extends AbstractContainer {
-    onMessage (m) {
-      t.equal(m.tag, 99, 'should receive message')
-      this.inbox.currentMessage = message
-    }
-
-    static get typeId () {
-      return 9
-    }
-  }
-
-  const wasm = fs.readFileSync(`${__dirname}/wasm/responses.wasm`)
-  hypervisor.registerContainer(CaptureContainer)
-  hypervisor.registerContainer(WasmContainer, {
-    env: SystemInterface,
-    test: testInterface(t)
-  })
-
-  const message = new Message({
-    data: wasm
-  })
-  message.responseCap = await hypervisor.createActor(CaptureContainer.typeId, new Message())
-  message.responseCap.tag = 99
-  await hypervisor.createActor(WasmContainer.typeId, message)
-})
-
-tape('getting next messages with response caps', async t => {
-  t.plan(3)
-  const hypervisor = new Hypervisor(tree)
-
-  class CaptureContainer extends AbstractContainer {
-    onMessage (m) {
-      t.equal(m.tag, 99, 'should receive message')
-    }
-
-    static get typeId () {
-      return 9
-    }
-  }
-
-  const wasm = fs.readFileSync(`${__dirname}/wasm/getNextMessage.wasm`)
-  hypervisor.registerContainer(CaptureContainer)
-  hypervisor.registerContainer(WasmContainer, {
-    env: SystemInterface,
-    test: testInterface(t)
-  })
-
-  const message = new Message({
-    data: wasm
-  })
-  message.responseCap = await hypervisor.createActor(CaptureContainer.typeId, new Message())
-  message.responseCap.tag = 99
-  const cap = await hypervisor.createActor(WasmContainer.typeId, message)
-
-  const message1 = new Message()
-  hypervisor.send(cap, message1)
-})
-
 tape('creation test', async t => {
-  t.plan(2)
+  t.plan(1)
   const hypervisor = new Hypervisor(tree)
   const wasm = fs.readFileSync(`${__dirname}/wasm/createInstance.wasm`)
 
