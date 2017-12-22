@@ -82,7 +82,7 @@ module.exports = class SystemInterface {
   }
 
   sendMessage (capRef, messageRef) {
-    const cap = this.referanceMap.get(capRef)
+    const cap = this.referanceMap.get(capRef, Cap)
     const message = this.referanceMap.get(messageRef, Message)
     this.actor.send(cap, message)
   }
