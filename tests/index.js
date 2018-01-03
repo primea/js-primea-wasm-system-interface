@@ -86,80 +86,6 @@ tape('getting a messages cap', async t => {
   }))
 })
 
-tape('caps storing', async t => {
-  // t.plan(1)
-  const hypervisor = new Hypervisor(tree)
-  const wasm = fs.readFileSync(`${__dirname}/wasm/storeCap.wasm`)
-  hypervisor.registerContainer(WasmContainer, {
-    env: SystemInterface,
-    test: testInterface(t)
-  })
-  const toStore = {}
-
-  const cap = await hypervisor.createActor(WasmContainer.typeId, new Message({
-    data: wasm,
-    caps: [toStore]
-  }))
-  const instance = await hypervisor.getActor(cap.destId)
-  await hypervisor.scheduler.wait(Infinity)
-  const msg = await instance.state.get(Buffer.from([0, 1, 0, 0, 0]))
-  t.equals(msg.caps[0], toStore)
-  t.end()
-})
-
-tape('load cap', async t => {
-  t.plan(2)
-  const hypervisor = new Hypervisor(tree)
-  const wasm = fs.readFileSync(`${__dirname}/wasm/loadCap.wasm`)
-  hypervisor.registerContainer(WasmContainer, {
-    env: SystemInterface,
-    test: testInterface(t)
-  })
-
-  const toStore = {}
-  const cap = await hypervisor.createActor(WasmContainer.typeId, new Message({
-    data: wasm,
-    caps: [toStore]
-  }))
-  const instance = await hypervisor.getActor(cap.destId)
-  await hypervisor.scheduler.wait(Infinity)
-  const msg = await instance.state.get(Buffer.from([0, 0, 0, 0, 0]))
-  t.equals(msg.caps[0], toStore, 'store cap')
-
-  const message = new Message({
-    data: 'test',
-    caps: [toStore]
-  })
-  await instance.runMessage(message)
-})
-
-tape('delete cap', async t => {
-  t.plan(2)
-  const hypervisor = new Hypervisor(tree)
-  const wasm = fs.readFileSync(`${__dirname}/wasm/deleteCap.wasm`)
-  hypervisor.registerContainer(WasmContainer, {
-    env: SystemInterface,
-    test: testInterface(t)
-  })
-
-  const toStore = {}
-  const cap = await hypervisor.createActor(WasmContainer.typeId, new Message({
-    data: wasm,
-    caps: [toStore]
-  }))
-
-  const instance = await hypervisor.getActor(cap.destId)
-  await hypervisor.scheduler.wait(Infinity)
-  let msg = await instance.state.get(Buffer.from([0, 0, 0, 0, 0]))
-  t.equals(msg.caps[0], toStore)
-
-  const message = new Message()
-  await instance.runMessage(message)
-
-  msg = await instance.state.get(Buffer.from([0, 0, 0, 0, 0]))
-  t.equals(msg, undefined)
-})
-
 tape('reading message data', async t => {
   t.plan(5)
   const hypervisor = new Hypervisor(tree)
@@ -292,4 +218,20 @@ tape('loading caps from messages that dont exist', async t => {
   }).on('execution:error', e => {
     t.pass('should error')
   }))
+})
+
+tape('store', async t => {
+  const hypervisor = new Hypervisor(tree)
+  const main = fs.readFileSync(`${__dirname}/wasm/store.wasm`)
+  hypervisor.registerContainer(WasmContainer, {
+    env: SystemInterface,
+    test: testInterface(t)
+  })
+
+  const cap = await hypervisor.createActor(WasmContainer.typeId, new Message({
+    data: main
+  }))
+
+  await hypervisor.send(cap, new Message())
+  t.end()
 })

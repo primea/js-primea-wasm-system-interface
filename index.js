@@ -1,6 +1,11 @@
 const Message = require('primea-message')
 const Cap = require('primea-capability')
 const WasmContainer = require('primea-wasm-container')
+const Store = require('./store.js')
+
+const RadixTree = require('dfinity-radix-tree')
+
+const STOAGEKEY = [1, 0]
 
 module.exports = class SystemInterface {
   constructor (wasmContainer) {
@@ -9,40 +14,42 @@ module.exports = class SystemInterface {
     this.referanceMap = wasmContainer.referanceMap
   }
 
+  deleteStore (storeRef) {
+    const store = this.wasmContainer.referanceMap.get(storeRef, Store)
+    store.delete()
+    this.wasmContainer.referanceMap.delete(storeRef)
+  }
+
+  updateStore (storeRef, messageRef) {
+    const message = this.wasmContainer.referanceMap.get(messageRef, Message)
+    const store = this.wasmContainer.referanceMap.get(storeRef, Store)
+    store.update(message)
+  }
+
+  async openStore (offset, len, cb) {
+    let key = this.wasmContainer.getMemory(offset, len)
+    const json = new RadixTree.ArrayConstructor(key).toJSON()
+    key = new RadixTree.ArrayConstructor(STOAGEKEY.concat(json))
+    const promise = this.actor.state.get(key)
+    await this.wasmContainer.pushOpsQueue(promise)
+    let message = await promise
+    let error = 0
+    if (!message) {
+      error = -1
+      message = new Message()
+    }
+    const messageRef = this.wasmContainer.referanceMap.add(message)
+    const store = new Store(key, this.actor.state)
+    const storeRef = this.wasmContainer.referanceMap.add(store)
+    this.wasmContainer.execute(cb, storeRef, messageRef, error)
+  }
+
   createMessage (offset, len) {
     const data = this.wasmContainer.getMemory(offset, len)
     const message = new Message({
       data: data
     })
     return this.wasmContainer.referanceMap.add(message)
-  }
-
-  mintCap (tag) {
-    const cap = this.actor.mintCap(tag)
-    return this.wasmContainer.referanceMap.add(cap)
-  }
-
-  storeMessage (index, messageRef) {
-    const message = this.wasmContainer.referanceMap.get(messageRef, Message)
-    let key = Buffer.alloc(5)
-    key.writeUInt32LE(index, 1)
-    this.actor.state.set(key, message)
-  }
-
-  deleteMessage (index) {
-    let key = Buffer.alloc(5)
-    key.writeUInt32LE(index, 1)
-    this.actor.state.delete(key)
-  }
-
-  async loadMessage (index, cb) {
-    let key = Buffer.alloc(5)
-    key.writeUInt32LE(index, 1)
-    const promise = this.actor.state.get(key)
-    await this.wasmContainer.pushOpsQueue(promise)
-    const message = await promise
-    const messageRef = this.wasmContainer.referanceMap.add(message)
-    this.wasmContainer.execute(cb, messageRef)
   }
 
   messageDataLen (messageRef) {
@@ -103,6 +110,11 @@ module.exports = class SystemInterface {
     } else {
       this.wasmContainer.execute(cb)
     }
+  }
+
+  mintCap (tag) {
+    const cap = this.actor.mintCap(tag)
+    return this.wasmContainer.referanceMap.add(cap)
   }
 
   deleteRef (ref) {
